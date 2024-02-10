@@ -7,6 +7,7 @@ import 'package:todo/todo/view_model/todo_view_model.dart';
 
 /// KISS (Keep It Simple, Stupid)
 /// DRY (Don't Repeat Yourself)
+///
 /// Main screen with List of the [ListTile]
 class TodoScreen extends StatelessWidget {
   const TodoScreen({super.key});
