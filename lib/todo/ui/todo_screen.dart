@@ -43,47 +43,10 @@ class TodoScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showAddTodoDialog(context),
+        onPressed: () => showTodoDialog(context),
         tooltip: 'Add Task',
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  /// We are showing Dialog to create new To Do item and add to the list
-  void showAddTodoDialog(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('New TODO'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(hintText: 'Enter something to do...'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('CANCEL'),
-              onPressed: () {
-                controller.clear();
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('ADD'),
-              onPressed: () {
-                final task = controller.text;
-                if (task.isNotEmpty) {
-                  context.read<TodoViewModel>().addItem(task);
-                  controller.clear();
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -122,42 +85,57 @@ class TodoScreen extends StatelessWidget {
             }
           },
         ),
-        onTap: () {
-          final TextEditingController controller = TextEditingController();
-          controller.text = item.title;
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Edit TODO'),
-                content: TextField(
-                  controller: controller,
-                  decoration: const InputDecoration(hintText: 'Edit your task...'),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      controller.clear();
-                    },
-                  ),
-                  TextButton(
-                    child: const Text('UPDATE'),
-                    onPressed: () {
-                      if (controller.text.isNotEmpty) {
-                        model.changeItem(index, title: controller.text);
-                        controller.clear();
-                      }
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            },
-          );
-        },
+        onTap: () => showTodoDialog(context, input: item.title, index: index),
       ),
+    );
+  }
+
+  /// We are showing Dialog to create new To Do item and add to the list
+  /// This dialog is used also to edit To Do item, but input and index should be mentioned then
+  void showTodoDialog(BuildContext context, {String? input, int index = 0}) {
+    final TextEditingController controller = TextEditingController();
+    final bool isNewTodo = input == null || input.isEmpty;
+    if (!isNewTodo) {
+      controller.text = input;
+    }
+    final TodoViewModel model = context.read<TodoViewModel>();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(isNewTodo ? 'New TODO' : 'Edit TODO'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: isNewTodo ? 'Enter something to do...' : 'Edit your task...',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                controller.clear();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(isNewTodo ? 'ADD' : 'SAVE'),
+              onPressed: () {
+                final task = controller.text;
+                if (task.isNotEmpty) {
+                  if (isNewTodo) {
+                    model.addItem(task);
+                  } else {
+                    model.changeItem(index, title: task);
+                  }
+                  controller.clear();
+                }
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

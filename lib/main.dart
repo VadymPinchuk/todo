@@ -16,11 +16,11 @@ import 'package:todo/todo/view_model/todo_view_model.dart';
 
 /// It is main entry point where application is created and started
 void main() => runApp(
-      ChangeNotifierProvider(
-        create: (BuildContext context) => TodoViewModel(),
-        child: MaterialApp(
-          theme: ThemeData.dark(),
-          home: const TodoScreen(),
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: ChangeNotifierProvider(
+          create: (BuildContext context) => TodoViewModel(),
+          child: const TodoScreen(),
         ),
       ),
     );
